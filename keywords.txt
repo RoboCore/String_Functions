@@ -1,0 +1,6 @@
+NULL	LITERAL1
+
+StrLength	KEYWORD2
+StrConcat	KEYWORD2
+StrRemove	KEYWORD2
+

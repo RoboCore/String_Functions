@@ -1,0 +1,10 @@
+****************************
+  String_Functions Library
+****************************
+
+!!! added to Arduino libraries folder 13/02/2013
+
+
+
+
+
