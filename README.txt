@@ -6,3 +6,9 @@
 
   Released under the Beerware licence
 
+
+
+ NOTE: the library uses malloc() to create the strings,
+	so one must free the string after using it.
+
+
