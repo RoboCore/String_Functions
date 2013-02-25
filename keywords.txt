@@ -1,6 +1,15 @@
-NULL	LITERAL1
 
 StrLength	KEYWORD2
 StrConcat	KEYWORD2
+StrFind	KEYWORD2
+StrParser	KEYWORD2
+StrParserLength	KEYWORD2
+StrParserQty	KEYWORD2
 StrRemove	KEYWORD2
+
+UsingMemory	KEYWORD2
+
+
+
+
 

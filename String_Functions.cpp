@@ -2,19 +2,34 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.0 - 30/01/2013)
+		(v1.1 - 25/02/2013)
 
   Library to manipulate strings
 
   Released under the Beerware licence
-*/
 
+
+  NOTE: the library uses malloc() to create the strings,
+	so one must free the string after using it.
+        # can use <Memory.h> to use the PointerList (just
+            include it in the main sketch)
+            >> see UsingMemory()
+
+  NOTE: more functions (and alternative ones) can be found
+	in the <string.h> library
+
+
+
+  OBS:	char* str1 = "test";
+		//in .DATA section, DO NOT free (because will
+			add this address to the free_list)
+	char* str2 = (char*)malloc(10);
+		//in the HEAP, so CAN be freed
+*/
 
 #include "String_Functions.h"
 
 //#define RC_STRING_DEBUG
-
-#define NULL 0
 
 
 //-------------------------------------------------------------------------------------------------
@@ -39,17 +54,32 @@ int StrLength(char* string){
 
 // Concatenate two strings
 //  NOTE: it doesn't change any of the given strings
+//    (returns NULL on error or if given strings are empty, pointer to one of the strings
+//          if the other is empty, or the concatenated string)
 char* StrConcat(char* str1, char* str2){
   int len1 = StrLength(str1);
   int len2 = StrLength(str2);
   
+  //check strings
+  if((len1 == 0) && (len2 == 0))
+    return NULL;
+  else if(len1 == 0)
+    return str2;
+  else if(len2 == 0)
+    return str1;
+  
   //create new temporary string
-  char *newstr = (char*)malloc((len1 + len2 + 1) * sizeof(char));
+#ifdef RC_MEMORY
+  PointerList::Initialize();
+  char* newstr = (char*)Mmalloc((len1 + len2 + 1) * sizeof(char));
+#else
+  char* newstr = (char*)malloc((len1 + len2 + 1) * sizeof(char));
+#endif
   if(newstr == NULL){
 #ifdef RC_STRING_DEBUG
     Serial.println("ERROR in StrConcat: cannot allocate memory!");
 #endif
-    return "";
+    return NULL;
   }
   
   //fill string
@@ -64,9 +94,284 @@ char* StrConcat(char* str1, char* str2){
 
 //-------------------------------------------------------------------------------------------------
 
+// Finds the position of a character in a string
+//  NOTE: by default uses CASE_SENSITIVE comparison
+//    (returns -1 if 'string' is empty, 'c' wasn't found or 'c' is NULL)
+int StrFind(char* string, char c){
+  return StrFind(string, c, CASE_SENSITIVE);
+}
+
+
+// Finds the position of a character in a string
+//    (returns -1 if 'string' is empty, 'c' wasn't found or 'c' is NULL)
+int StrFind(char* string, char c, byte options){
+  int length = StrLength(string);
+  int pos = -1;
+  
+  //check length
+  if(length == 0)
+    return pos;
+  if(c == NULL)
+    return pos;
+  
+  //find character
+  for(int i=0 ; i < length ; i++){
+    //binary comparison
+    if(c == string[i]){
+      pos = i;
+      break;
+    }
+    
+    //case INSENSITIVE comparison
+    if(options & CASE_INSENSITIVE){
+      if((c >= 65) && (c <= 90)){ //'A' to 'Z'
+        if((c + 32) == string[i]){
+          pos = i;
+          break;
+        }
+      }
+      if((c >= 97) && (c <= 122)){ //'a' to 'z'
+        if((c - 32) == string[i]){
+          pos = i;
+          break;
+        }
+      }
+    }
+  }
+  
+  return pos;
+}
+
+//-----------------------------------
+
+// Finds the position of str2 in str1
+//  NOTE: by default uses CASE_SENSITIVE comparison
+//    (returns -1 if str2 > str1, str2 is empty or coudn't find)
+int StrFind(char* str1, char* str2){
+  return StrFind(str1, str2, CASE_SENSITIVE);
+}
+
+
+// Finds the position of str2 in str1
+//    (returns -1 if str2 > str1, str2 is empty or coudn't find)
+int StrFind(char* str1, char* str2, byte options){
+  int len1 = StrLength(str1);
+  int len2 = StrLength(str2);
+  int pos = -1;
+  
+  //check length
+  if(len1 < len2)
+    return pos;
+  if(len2 == 0)
+    return pos;
+  
+  //find character
+  boolean began = false; //true when found the first character
+  char c1, c2;
+  for(int i=0 ; i < len1 ; i++){
+    //check if already found
+    if((pos != -1) && ((i - pos) >= len2))
+      break;
+    
+    //get chars to compare
+    c1 = str1[i]; //get unchanged
+    if(!began) //if not yet found, compare with first
+      c2 = str2[0];
+    else //otherwise get next
+      c2 = str2[i - pos];
+    
+    //binary comparison
+    if(c1 == c2){
+      if(!began){ //assign once
+        pos = i;
+        began = true; //set
+      }
+    } else if(began && (options ^ CASE_INSENSITIVE)){ //broke sequence and is CASE_SENSITIVE, so find next
+      pos = -1;
+      began = false; //reset
+    }
+    
+    //case INSENSITIVE comparison
+    if(options & CASE_INSENSITIVE){
+      if((c1 >= 97) && (c1 <= 122)) //'a' to 'z'
+        c1 -= 32; //convert to 'A' to 'Z'
+      
+      if((c2 >= 97) && (c2 <= 122)) //'a' to 'z'
+        c2 -= 32; //convert to 'A' to 'Z'
+      
+      if(c1 == c2){
+        if(!began){ //assign once
+          pos = i;
+          began = true; //set
+        }
+      } else if(began){ //broke sequence (already checked for binary), so find next
+        pos = -1;
+        began = false; //reset
+      }
+    }
+  }
+  
+  return pos;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// Parses the string to get the string at the desired index (1 based)
+//    (returns NULL if the string is empty (length of 0), if NULL delimiter or
+//          if the index is not valid, or the desired string)
+char* StrParser(char* string, char delimiter, int index){
+  //NOTE: it is preferable to use the same (almost) code of StrParserLength() to avoid
+  //        growing the stack and more processing
+  
+  //check if valid length
+  int length = StrLength(string);
+  if(length <= 0) //no string
+    return NULL;
+  
+  //check delimiter
+  if(delimiter == NULL)
+    return NULL;
+  
+  //parse
+  int current_string = 1; //assume at least one exists, even if no delimiter was found
+  if(string[0] == delimiter) //oups, the string begins with a delimiter, so must reset the counter
+    current_string = 0;
+  boolean found_delimiter = false;
+  int string_length = 0; //the length of the desired string
+  int pos = -1; //the position were the desired string was found
+  for(int i=0 ; (i < length) && (current_string <= index) ; i++){
+    if(string[i] == delimiter){
+      found_delimiter = true; //found one!
+    } else if(found_delimiter){
+      found_delimiter = false; //reset
+      current_string++; //one more string!
+    }
+    
+    //leave loop if the string was already found
+    if(current_string > index)
+      break;
+    
+    //if is the desired string, add one character
+    if((current_string == index) && !found_delimiter)
+      string_length++;
+    
+    //store the initial position of the desired string
+    if((current_string == index) && (pos == -1)) //must store only once
+      pos = i;
+  }
+  
+  //check if the string was found
+  if(pos == -1){ // OR (string_length == 0)
+    return NULL;
+  }
+  
+  //create new temporary string
+#ifdef RC_MEMORY
+  PointerList::Initialize();
+  char* newstr = (char*)Mmalloc((string_length + 1) * sizeof(char)); //allocate memory
+#else
+  char* newstr = (char*)malloc((string_length + 1) * sizeof(char)); //allocate memory
+#endif
+
+  if(newstr == NULL){
+#ifdef RC_STRING_DEBUG
+    Serial.println("ERROR in StrParse: cannot allocate memory!");
+#endif
+    return NULL;
+  }
+  
+  //fill string
+  newstr[string_length] = '\0'; //insert End Of String
+  for(int i=0 ; i < string_length ; i++){
+    newstr[i] = string[pos+i];
+  }
+  
+  return newstr;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// Get the length of the string (of given index >> 1 based) in the string to parse
+//    (returns 0 if empty string, NULL delimiter or invalid index, or the string length)
+int StrParserLength(char* string, char delimiter, int index){
+  //check if valid length
+  int length = StrLength(string);
+  if(length <= 0) //no string
+    return 0;
+  
+  //check delimiter
+  if(delimiter == NULL)
+    return 0;
+  
+  //find number of strings
+  int current_string = 1; //assume at least one exists, even if no delimiter was found
+  if(string[0] == delimiter) //oups, the string begins with a delimiter, so must reset the counter
+    current_string = 0;
+  boolean found_delimiter = false;
+  int string_length = 0;
+  for(int i=0 ; (i < length) && (current_string <= index) ; i++){
+    if(string[i] == delimiter){
+      found_delimiter = true; //found one!
+    } else if(found_delimiter){
+      found_delimiter = false; //reset
+      current_string++; //one more string!
+    }
+    
+    //leave loop if the string was already found
+    if(current_string > index)
+      break;
+    
+    //if is the desired string, add one character
+    if((current_string == index) && !found_delimiter)
+      string_length++;
+  }
+  
+  return string_length;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// Get the number of valid strings to parse
+//    (returns 0 if empty string or NULL delimiter, or the number of strings)
+int StrParserQty(char* string, char delimiter){
+  //check if valid length
+  int length = StrLength(string);
+  if(length <= 0) //oups, I guess there was no string after all
+    return 0;
+  
+  //check delimiter
+  if(delimiter == NULL)
+    return 0;
+  
+  //find number of strings
+  int num_strings = 1; //assume at least one exists, even if no delimiter was found
+  if(string[0] == delimiter) //oups, the string begins with a delimiter, so must reset the counter
+    num_strings = 0;
+  boolean found_delimiter = false;
+  for(int i=0 ; i < length ; i++){
+    if(string[i] == delimiter){
+      found_delimiter = true; //found one!
+    } else if(found_delimiter){
+      found_delimiter = false; //reset
+      num_strings++; //one more string!
+    }
+  }
+  
+  return num_strings;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 // Removes a character from a string
+//    (returns NULL on error or if 'string' is empty, pointer to 'string' if 'c' is NULL)
 char* StrRemove(char* string, char c){
   int length = StrLength(string);
+  
+  //check length
+  if(length == 0)
+    return NULL;
+  if(c == NULL)
+    return string;
   
   //find the number of ocurences
   int count = 0;
@@ -76,12 +381,17 @@ char* StrRemove(char* string, char c){
   }
   
   //allocates
+#ifdef RC_MEMORY
+  PointerList::Initialize();
+  char* res = (char*)Mmalloc((length - count + 1) * sizeof(char));
+#else
   char* res = (char*)malloc((length - count + 1) * sizeof(char));
+#endif
   if(res == NULL){
 #ifdef RC_STRING_DEBUG
     Serial.println("ERROR in StrRemove: cannot allocate memory!");
 #endif
-    return "";
+    return NULL;
   }
   
   //assign values
@@ -97,12 +407,19 @@ char* StrRemove(char* string, char c){
   return res;
 }
 
-//-------------------------------------------------------------------------------------------------
+//-----------------------------------
 
 // Removes a series of characters from a string
+//    (returns NULL on error or if given string is empty, pointer to 'string' if 'characters' is empty)
 char* StrRemove(char* string, char* characters){
   int length = StrLength(string);
   int lenc = StrLength(characters);
+  
+  //check length
+  if(length == 0)
+    return NULL;
+  if(lenc == 0)
+    return string;
   
   //find the number of ocurences
   int count = 0;
@@ -114,12 +431,17 @@ char* StrRemove(char* string, char* characters){
   }
   
   //allocates
+#ifdef RC_MEMORY
+  PointerList::Initialize();
+  char* res = (char*)Mmalloc((length - count + 1) * sizeof(char));
+#else
   char* res = (char*)malloc((length - count + 1) * sizeof(char));
+#endif
   if(res == NULL){
 #ifdef RC_STRING_DEBUG
     Serial.println("ERROR in StrRemove: cannot allocate memory!");
 #endif
-    return "";
+    return NULL;
   }
   
   //assign values
@@ -146,6 +468,16 @@ char* StrRemove(char* string, char* characters){
 
 //-------------------------------------------------------------------------------------------------
 
+// Check whether is using <Memory.h>
+boolean UsingMemory(){
+#ifdef RC_MEMORY
+  return true;
+#else
+  return false;
+#endif
+}
+
+//-------------------------------------------------------------------------------------------------
 
 
 
