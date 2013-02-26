@@ -7,8 +7,6 @@ StrParserLength	KEYWORD2
 StrParserQty	KEYWORD2
 StrRemove	KEYWORD2
 
-UsingMemory	KEYWORD2
-
 
 
 

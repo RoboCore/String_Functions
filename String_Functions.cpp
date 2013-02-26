@@ -2,18 +2,18 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.1 - 25/02/2013)
+		(v1.2 - 26/02/2013)
 
   Library to manipulate strings
+    (tested only in Arduino 1.0.1)
 
   Released under the Beerware licence
 
 
-  NOTE: the library uses malloc() to create the strings,
-	so one must free the string after using it.
-        # can use <Memory.h> to use the PointerList (just
-            include it in the main sketch)
-            >> see UsingMemory()
+  NOTE: the library uses malloc() to create the strings and
+        the Pointer List in <Memory.h> is usedby default .
+        To use regular malloc(), undefine USE_POINTER_LIST
+        in <Memory.h>
 
   NOTE: more functions (and alternative ones) can be found
 	in the <string.h> library
@@ -29,7 +29,6 @@
 
 #include "String_Functions.h"
 
-//#define RC_STRING_DEBUG
 
 
 //-------------------------------------------------------------------------------------------------
@@ -69,12 +68,13 @@ char* StrConcat(char* str1, char* str2){
     return str1;
   
   //create new temporary string
-#ifdef RC_MEMORY
+#ifdef USE_POINTER_LIST
   PointerList::Initialize();
   char* newstr = (char*)Mmalloc((len1 + len2 + 1) * sizeof(char));
 #else
   char* newstr = (char*)malloc((len1 + len2 + 1) * sizeof(char));
 #endif
+
   if(newstr == NULL){
 #ifdef RC_STRING_DEBUG
     Serial.println("ERROR in StrConcat: cannot allocate memory!");
@@ -266,7 +266,7 @@ char* StrParser(char* string, char delimiter, int index){
   }
   
   //create new temporary string
-#ifdef RC_MEMORY
+#ifdef USE_POINTER_LIST
   PointerList::Initialize();
   char* newstr = (char*)Mmalloc((string_length + 1) * sizeof(char)); //allocate memory
 #else
@@ -381,12 +381,13 @@ char* StrRemove(char* string, char c){
   }
   
   //allocates
-#ifdef RC_MEMORY
+#ifdef USE_POINTER_LIST
   PointerList::Initialize();
   char* res = (char*)Mmalloc((length - count + 1) * sizeof(char));
 #else
   char* res = (char*)malloc((length - count + 1) * sizeof(char));
 #endif
+
   if(res == NULL){
 #ifdef RC_STRING_DEBUG
     Serial.println("ERROR in StrRemove: cannot allocate memory!");
@@ -431,12 +432,13 @@ char* StrRemove(char* string, char* characters){
   }
   
   //allocates
-#ifdef RC_MEMORY
+#ifdef USE_POINTER_LIST
   PointerList::Initialize();
   char* res = (char*)Mmalloc((length - count + 1) * sizeof(char));
 #else
   char* res = (char*)malloc((length - count + 1) * sizeof(char));
 #endif
+
   if(res == NULL){
 #ifdef RC_STRING_DEBUG
     Serial.println("ERROR in StrRemove: cannot allocate memory!");
@@ -464,17 +466,6 @@ char* StrRemove(char* string, char* characters){
   }
   
   return res;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-// Check whether is using <Memory.h>
-boolean UsingMemory(){
-#ifdef RC_MEMORY
-  return true;
-#else
-  return false;
-#endif
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -3,8 +3,7 @@
 #include <Memory.h>
 #include "String_Functions.h"
 
-// if NOT using <Memory.h>, can call the commented free() calls
-//      to free the allocated memory instead of using PointerList
+// see README.txt to not use the Pointer List
 
 //-------------------------------------------------------------------------------------------------
 
@@ -18,7 +17,7 @@ void setup(){
 void loop(){
   
   Serial.print("<Memory> ");
-  if(UsingMemory())
+  if(UsingPointerList())
     Serial.println("OK");
   else
     Serial.println("no");

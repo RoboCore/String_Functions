@@ -1,17 +1,17 @@
 
 	RoboCore String Functions Library
-		(v1.1 - 25/02/2013)
+		(v1.2 - 26/02/2013)
 
   Library to manipulate strings
+    (tested only in Arduino 1.0.1)
 
   Released under the Beerware licence
 
 
-  NOTE: the library uses malloc() to create the strings,
-	so one must free the string after using it.
-        # can use <Memory.h> to use the PointerList (just
-            include it in the main sketch)
-		>> see UsingMemory()
+  NOTE: the library uses malloc() to create the strings and
+        the Pointer List in <Memory.h> is usedby default .
+        To use regular malloc(), undefine USE_POINTER_LIST
+        in <Memory.h>
 
   NOTE: more functions (and alternative ones) can be found
 	in the <string.h> library
