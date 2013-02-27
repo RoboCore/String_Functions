@@ -2,7 +2,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.2 - 26/02/2013)
+		(v1.3 - 27/02/2013)
 
   Library to manipulate strings
     (tested only in Arduino 1.0.1)
@@ -33,20 +33,94 @@
 
 //-------------------------------------------------------------------------------------------------
 
-// Get the length of a string
-int StrLength(char* string){
-  int length = 0;
-  boolean leave = false;
+//IMPORTANT: DO NOT forget to cast to (byte) when calling overloads with 'option'
 
-  //find the length of the string
-  while(!leave){
-    if(string[length] == '\0')
-      leave = true;
-    else
-      length++;
+int StrCompare(char* str1, char* str2){
+  return StrCompare(str1, str2, 0, StrLength(str2), CASE_SENSITIVE);
+}
+
+
+int StrCompare(char* str1, char* str2, byte options){
+  return StrCompare(str1, str2, 0, StrLength(str2), options);
+}
+
+//-----------------------------------
+
+int StrCompare(char* str1, char* str2, int start){
+  return StrCompare(str1, str2, start, StrLength(str2), CASE_SENSITIVE);
+}
+
+
+int StrCompare(char* str1, char* str2, int start, byte options){
+  return StrCompare(str1, str2, start, StrLength(str2), options);
+}
+
+//-----------------------------------
+
+int StrCompare(char* str1, char* str2, int start, int length){
+  return StrCompare(str1, str2, start, length, CASE_SENSITIVE);
+}
+
+//-----------------------------------
+
+// Compares str2 with str1 and with given options, starting from start in str1
+//   and until length or end of str2 is reached
+//  NOTE: by default start = 0, length = StrLength(str2) and is CASE_SENSITIVE
+//    (returns the number of matched characters (0 if none matched) or
+//      -1 on errror)
+//  NOTE: if(return == StrLength(str2)), str2 was found in str1. Otherwise
+//          only part (or nothing) of str2 was found
+int StrCompare(char* str1, char* str2, int start, int length, byte options){
+  //validate input
+  if(start < 0)
+    return -1;
+  if(length <= 0)
+    return -1;
+  
+  //get length of the strings
+  int len1 = StrLength(str1);
+  int len2 = StrLength(str2);
+  
+  //check strings
+  if((len1 == 0) || (len2 == 0))
+    return -1;
+  else if(len2 > len1)
+    return -1;
+  
+  //check total length
+  if(len1 < (start + len2))
+    return -1; 
+  
+  //start comparison
+  int match = 0;
+  char c1, c2;
+  for(int i=0 ; i < length ; i++){
+    //search until end of str2 or length
+    if(i >= len2)
+      break;
+    
+    //get chars to compare
+    c1 = str1[i + start]; //get with offset
+    c2 = str2[i]; //get unchanged
+    
+    //binary comparison
+    if((c1 != c2) && (options ^ CASE_INSENSITIVE)){ //different character and case SENSITIVE
+      break;
+    } else if((c1 != c2) && (options & CASE_INSENSITIVE)){ //case INSENSITIVE comparison
+      if((c1 >= 97) && (c1 <= 122)) //'a' to 'z'
+        c1 -= 32; //convert to 'A' to 'Z'
+      
+      if((c2 >= 97) && (c2 <= 122)) //'a' to 'z'
+        c2 -= 32; //convert to 'A' to 'Z'
+      
+      if(c1 != c2) //different characters
+        break;
+    }
+    
+    match++; //if reached here, means characters are equal
   }
   
-  return length;
+  return match;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -212,6 +286,24 @@ int StrFind(char* str1, char* str2, byte options){
   }
   
   return pos;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// Get the length of a string
+int StrLength(char* string){
+  int length = 0;
+  boolean leave = false;
+
+  //find the length of the string
+  while(!leave){
+    if(string[length] == '\0')
+      leave = true;
+    else
+      length++;
+  }
+  
+  return length;
 }
 
 //-------------------------------------------------------------------------------------------------

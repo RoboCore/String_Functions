@@ -162,6 +162,34 @@ void loop(){
   Serial.print("(same): "); Serial.print(StrFind(str, str)); Serial.print(" | "); Serial.println(StrFind(str, str, CASE_INSENSITIVE));
   
   
+  Serial.println();
+  Serial.println("#4"); //*********************************************
+  AvailableMemory(&Serial, true);
+  
+  Serial.println(StrCompare("AbCdE", "Bc")); //return 0
+  Serial.println(StrCompare("AbCdE", "Bc", (byte)CASE_INSENSITIVE)); //return 0
+  Serial.println(StrCompare("AbCdE", "aB")); //return 0
+  Serial.println(StrCompare("AbCdE", "aB", (byte)CASE_INSENSITIVE)); //return 2
+  
+  Serial.println();
+  Serial.println(StrCompare("AbCdE", "Bc", 1)); //return 0
+  Serial.println(StrCompare("AbCdE", "Bc", 1, (byte)CASE_INSENSITIVE)); //return 2 (!!! must cast to byte to call proper function)
+  Serial.println(StrCompare("AbCdE", "Bc", 1, 2, CASE_INSENSITIVE)); //return 2
+  
+  Serial.println();
+  Serial.println(StrCompare("AbCdE", "Bc", 1, 4)); //return 0
+  Serial.println(StrCompare("AbCdE", "bC", 1, 4)); //return 2
+  Serial.println(StrCompare("AbCdE", "Bc", 1, 3, CASE_INSENSITIVE)); //return 2
+  Serial.println(StrCompare("AbCdE", "Bc", 1, 1, CASE_INSENSITIVE)); //return 1
+  Serial.println(StrCompare("AbCdE", "Bc", -1, 3, CASE_INSENSITIVE)); //return -1
+  
+  Serial.println();
+  Serial.println(StrCompare("Bc", "AbCdE", 1, 3, CASE_INSENSITIVE)); //return -1
+  Serial.println(StrCompare("AbCdE", "Bc", 3, 3, CASE_INSENSITIVE)); //return 0
+  Serial.println(StrCompare("AbCdE", "Bc", 4, 3, CASE_INSENSITIVE)); //return -1
+  
+  
+  
   Serial.println("\n---FIM---");
   Serial.print("count: "); Serial.println(PointerList::ListCount());
   PointerList::DisplayList(&Serial);

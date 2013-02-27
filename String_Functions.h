@@ -3,7 +3,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.2 - 26/02/2013)
+		(v1.3 - 27/02/2013)
 
   Library to manipulate strings
     (tested only in Arduino 1.0.1)
@@ -40,15 +40,28 @@
 
 //#define RC_STRING_DEBUG
 
-// bitwise values for StrFind()
+// bitwise values for StrCompare() and StrFind()
 #define CASE_SENSITIVE 0
 #define CASE_INSENSITIVE (1 << 0)
 
 
 //-------------------------------------------------------------------------------------------------
 
-// Get the length of a string
-int StrLength(char* string);
+//IMPORTANT: DO NOT forget to cast to (byte) when calling overloads with 'option'
+
+// Compares str2 with str1 and with given options, starting from start in str1
+//   and until length or end of str2 is reached
+//  NOTE: by default start = 0, length = StrLength(str2) and is CASE_SENSITIVE
+//    (returns the number of matched characters (0 if none matched) or
+//      -1 on errror)
+//  NOTE: if(return == StrLength(str2)), str2 was found in str1. Otherwise
+//          only part (or nothing) of str2 was found
+int StrCompare(char* str1, char* str2);
+int StrCompare(char* str1, char* str2, byte options);
+int StrCompare(char* str1, char* str2, int start);
+int StrCompare(char* str1, char* str2, int start, byte options);
+int StrCompare(char* str1, char* str2, int start, int length);
+int StrCompare(char* str1, char* str2, int start, int length, byte options);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -72,6 +85,11 @@ int StrFind(char* string, char c, byte options);
 //    (returns -1 if str2 > str1, str2 is empty or coudn't find)
 int StrFind(char* str1, char* str2);
 int StrFind(char* str1, char* str2, byte options);
+
+//-------------------------------------------------------------------------------------------------
+
+// Get the length of a string
+int StrLength(char* string);
 
 //-------------------------------------------------------------------------------------------------
 

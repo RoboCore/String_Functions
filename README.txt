@@ -1,6 +1,6 @@
 
 	RoboCore String Functions Library
-		(v1.2 - 26/02/2013)
+		(v1.3 - 27/02/2013)
 
   Library to manipulate strings
     (tested only in Arduino 1.0.1)

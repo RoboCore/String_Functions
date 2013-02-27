@@ -1,7 +1,8 @@
 
-StrLength	KEYWORD2
+StrCompare	KEYWORD2
 StrConcat	KEYWORD2
 StrFind	KEYWORD2
+StrLength	KEYWORD2
 StrParser	KEYWORD2
 StrParserLength	KEYWORD2
 StrParserQty	KEYWORD2
