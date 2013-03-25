@@ -30,6 +30,7 @@
 
 #include "String_Functions.h"
 
+unsigned int RC_READ_SERIAL_DELAY = 10000; //in [us]
 
 //-------------------------------------------------------------------------------------------------
 
@@ -45,7 +46,7 @@ int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_size, char e
     while(serial->available()){
       buffer[count++] = serial->read();
       
-      delay(RC_READ_SERIAL_DElAY); //wait for all data to arrive
+      delayMicroseconds(RC_READ_SERIAL_DELAY); //wait for all data to arrive
       
       //check for buffer overflow
       if(count >= buffer_size){
@@ -75,7 +76,7 @@ int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_size, char e
         buffer[count++] = c;
       }
       
-      delay(RC_READ_SERIAL_DElAY); //wait for all data to arrive
+      delayMicroseconds(RC_READ_SERIAL_DELAY); //wait for all data to arrive
       
       //check for buffer overflow
       if(count >= buffer_size){

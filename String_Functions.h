@@ -45,7 +45,6 @@
 #define CASE_SENSITIVE 0
 #define CASE_INSENSITIVE (1 << 0)
 
-#define RC_READ_SERIAL_DElAY 10 // [ms]
 
 //-------------------------------------------------------------------------------------------------
 
