@@ -1,4 +1,5 @@
 
+ReadFromSerial	KEYWORD2
 StrCompare	KEYWORD2
 StrConcat	KEYWORD2
 StrFind	KEYWORD2

@@ -1,7 +1,17 @@
 
+/*
+	RoboCore - String Functions example
+		(27/02/2013)
+
+  Written by François
+  
+  Examples of how to use the several functions of
+  the library
+  
+*/
 
 #include <Memory.h>
-#include <String_Functions.h>
+#include "String_Functions.h"
 
 // see README.txt to not use the Pointer List
 

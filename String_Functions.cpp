@@ -8,6 +8,7 @@
     (tested with Arduino 0022 and 1.0.1)
 
   Released under the Beerware licence
+  Written by François
 
 
   NOTE: the library uses malloc() to create the strings and
@@ -30,6 +31,70 @@
 #include "String_Functions.h"
 
 
+//-------------------------------------------------------------------------------------------------
+
+// Read a string from serial until buffer is full, eol is reached (if eol not NULL) or
+//   no more characters in the serial buffer (if eol is NULL)
+//  (returns the string length)
+//  NOTE: it is recommended to create the buffer with 1 adicional char because
+//        the code adds the NULL termination
+//         (ex: desired size = 30 >> create with 31 and pass this value as parameter)
+int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_size, char eol){
+  int count = 0;
+  if(eol == NULL){ //default value, means wait for full buffer or no more characters
+    while(serial->available()){
+      buffer[count++] = serial->read();
+      
+      delay(RC_READ_SERIAL_DElAY); //wait for all data to arrive
+      
+      //check for buffer overflow
+      if(count >= buffer_size){
+        //flush serial buffer
+        while(serial->available()){
+          char c = serial->read();
+        }
+        break; //exit main while loop
+      }
+    }
+    
+    //add '\0' at the end (NULL terminated string)
+    buffer[buffer_size - 1] = '\0';
+    if(count < buffer_size)
+      buffer[count] = '\0';
+    
+    //correction for exact buffer size
+    if(count == buffer_size)
+      count--;
+    
+    return count;
+  } else { //wait for eol and ignore if serial buffer is empty
+    char c = eol - 1; //assign a different value for the first time
+    while(c != eol){
+      if(serial->available()){
+        c = serial->read();
+        buffer[count++] = c;
+      }
+      
+      delay(RC_READ_SERIAL_DElAY); //wait for all data to arrive
+      
+      //check for buffer overflow
+      if(count >= buffer_size){
+        //flush serial buffer
+        while(serial->available()){
+          c = serial->read();
+        }
+        break; //exit main while loop
+      }
+    }
+    
+    //add '\0' at the end (NULL terminated string)
+    buffer[buffer_size - 1] = '\0';
+    if(count < buffer_size)
+      buffer[count - 1] = '\0'; //(-1) because EOL is included
+    
+    return (count - 1); //(-1) because EOL is included
+  }
+}
 
 //-------------------------------------------------------------------------------------------------
 

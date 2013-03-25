@@ -6,6 +6,7 @@
     (tested with Arduino 0022 and 1.0.1)
 
   Released under the Beerware licence
+  Written by François
 
 
   NOTE: the library uses malloc() to create the strings and

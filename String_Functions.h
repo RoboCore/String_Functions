@@ -9,6 +9,7 @@
     (tested with Arduino 0022 and 1.0.1)
 
   Released under the Beerware licence
+  Written by François
 
 
   NOTE: the library uses malloc() to create the strings and
@@ -44,6 +45,17 @@
 #define CASE_SENSITIVE 0
 #define CASE_INSENSITIVE (1 << 0)
 
+#define RC_READ_SERIAL_DElAY 10 // [ms]
+
+//-------------------------------------------------------------------------------------------------
+
+// Read a string from serial until buffer is full, eol is reached (if eol not NULL) or
+//   no more characters in the serial buffer (if eol is NULL)
+//  (returns the string length)
+//  NOTE: it is recommended to create the buffer with 1 adicional char because
+//        the code adds the NULL termination
+//         (ex: desired size = 30 >> create with 31 and pass this value as parameter)
+int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_length, char eol = NULL);
 
 //-------------------------------------------------------------------------------------------------
 
