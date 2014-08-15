@@ -2,7 +2,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.3 - 27/02/2013)
+		(v1.4 - 15/08/2014)
 
   Library to manipulate strings
     (tested with Arduino 0022 and 1.0.1)
@@ -45,6 +45,63 @@
 #include "String_Functions.h"
 
 unsigned int RC_READ_SERIAL_DELAY = 10000; //in [us]
+
+//-------------------------------------------------------------------------------------------------
+
+// Convert an integer (long) to a string
+//  NOTE: it is recommended to create the buffer of at least 6 characters because
+//        the code adds the NULL termination
+//  NOTE: the buffer must be at least 2 characters long
+void IntToStr(long value, char *buffer, int buffer_size){
+  // check for a valid buffer
+  if(buffer_size < 2)
+    return;
+  
+  buffer_size--; // update, because array is 0 based (buffer_size is passed by value)
+  
+  // check for simples and common value
+  if(value == 0){
+    buffer[0] = 48; // '0' in ASCII char
+    buffer[1] = '\0';
+    return;
+  }
+  
+  byte negative = 0;
+  if(value < 0){
+    negative = 1;
+    value *= -1;
+  }
+  
+  buffer[buffer_size] = '\0'; // EOS in the last position
+  
+  // parse the value (value is passed by value)
+  for(int i=1 ; i <= buffer_size ; i++){
+    if(value == 0){
+      if(negative != 0){
+        buffer[buffer_size-i] = '-'; // add negative sign
+        negative = 0; // reset
+      } else {
+        buffer[buffer_size-i] = 48; // fill with leading zeros
+      }
+    } else {
+      buffer[buffer_size-i] = (value % 10) + 48; // convert to ASCII char
+    }
+    value /= 10;
+  }
+  
+  // remove leading zeros
+  byte count = 0;
+  for(int i=0 ; i < (buffer_size - 1) ; i++){
+    if(buffer[i] == '0')
+      count++;
+    else
+      break; // can have a 0 inside the number
+  }
+  for(int i=0 ; i < (buffer_size - count) ; i++){
+    buffer[i] = buffer[i+count];
+  }
+  buffer[buffer_size - count] = '\0'; // EOS in the last position (there can be more characters after that)
+}
 
 //-------------------------------------------------------------------------------------------------
 

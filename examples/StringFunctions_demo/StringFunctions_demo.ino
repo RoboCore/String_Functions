@@ -1,7 +1,7 @@
 
 /*
 	RoboCore - String Functions example
-		(27/02/2013)
+		(15/08/2014)
 
   Written by François
   
@@ -198,6 +198,38 @@ void loop(){
   Serial.println(StrCompare("AbCdE", "Bc", 3, 3, CASE_INSENSITIVE)); //return 0
   Serial.println(StrCompare("AbCdE", "Bc", 4, 3, CASE_INSENSITIVE)); //return -1
   
+  
+  Serial.println();
+  Serial.println("#5"); //*********************************************
+  AvailableMemory(&Serial, true);
+  
+  int buffer_size = 8;
+  char buffer[buffer_size];
+  long a;
+  
+  a = 0;
+  IntToStr(a, buffer, buffer_size); // return "0"
+  Serial.print(a);
+  Serial.print("\t|\t");
+  Serial.println(buffer);
+  
+  a = 100;
+  IntToStr(a, buffer, buffer_size); // return "100"
+  Serial.print(a);
+  Serial.print("\t|\t");
+  Serial.println(buffer);
+  
+  a = 13577;
+  IntToStr(a, buffer, buffer_size); // return "13577"
+  Serial.print(a);
+  Serial.print("\t|\t");
+  Serial.println(buffer);
+  
+  a = -3547;
+  IntToStr(a, buffer, buffer_size); // return "-3547"
+  Serial.print(a);
+  Serial.print("\t|\t");
+  Serial.println(buffer);
   
   
   Serial.println("\n---FIM---");

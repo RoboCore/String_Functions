@@ -3,7 +3,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.3 - 27/02/2013)
+		(v1.4 - 15/08/2014)
 
   Library to manipulate strings
     (tested with Arduino 0022 and 1.0.1)
@@ -59,6 +59,13 @@
 #define CASE_SENSITIVE 0
 #define CASE_INSENSITIVE (1 << 0)
 
+//-------------------------------------------------------------------------------------------------
+
+// Convert an integer (long) to a string
+//  NOTE: it is recommended to create the buffer of at least 6 characters because
+//        the code adds the NULL termination
+//  NOTE: the buffer must be at least 2 characters long
+void IntToStr(long value, char *buffer, int buffer_size);
 
 //-------------------------------------------------------------------------------------------------
 
