@@ -1,6 +1,6 @@
 
 	RoboCore String Functions Library
-		(v1.4 - 15/08/2014)
+		(v1.5 - 18/09/2014)
 
   Library to manipulate strings
     (tested with Arduino 0022 and 1.0.1)
@@ -31,6 +31,7 @@
   NOTE: more functions (and alternative ones) can be found
 	in the <string.h> library
 
+  NOTE: SoftwareSerial is only available for Arduino 1.0.1+
 
 
 

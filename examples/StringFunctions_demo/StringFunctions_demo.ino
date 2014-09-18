@@ -1,7 +1,7 @@
 
 /*
 	RoboCore - String Functions example
-		(15/08/2014)
+		(18/09/2014)
 
   Written by François
   
@@ -11,15 +11,18 @@
 */
 
 #include <Memory.h>
+#include <SoftwareSerial.h>
 #include "String_Functions.h"
 
 // see README.txt to not use the Pointer List
 
 //-------------------------------------------------------------------------------------------------
 
+SoftwareSerial softserial(2,3);
 
 void setup(){
   Serial.begin(9600);
+  softserial.begin(9600);
 }
 
 
@@ -238,7 +241,16 @@ void loop(){
   MReset();
   PointerList::DisplayList(&Serial);
   AvailableMemory(&Serial, true);
+  
+  int length;
   while(1){
+    length = ReadFromSerial(&Serial, buffer, buffer_size);
+    if(length > 0)
+      softserial.println(buffer);
+    
+    length = ReadFromSerial(&softserial, buffer, buffer_size, '#', 2000);
+    if(length > 0)
+      Serial.println(buffer);
   }
 }
 

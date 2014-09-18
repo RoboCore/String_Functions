@@ -2,7 +2,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.4 - 15/08/2014)
+		(v1.5 - 18/09/2014)
 
   Library to manipulate strings
     (tested with Arduino 0022 and 1.0.1)
@@ -32,6 +32,8 @@
 
   NOTE: more functions (and alternative ones) can be found
 	in the <string.h> library
+
+  NOTE: SoftwareSerial is only available for Arduino 1.0.1+
 
 
 
@@ -111,7 +113,7 @@ void IntToStr(long value, char *buffer, int buffer_size){
 //  NOTE: it is recommended to create the buffer with 1 additional char because
 //        the code adds the NULL termination
 //         (ex: desired size = 30 >> create with 31 and pass this value as parameter)
-int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_size, char eol){
+int ReadFromSerial(HardwareSerial *serial, char *buffer, int buffer_size, char eol, unsigned long timeout){
   int count = 0;
   if(eol == NULL){ //default value, means wait for full buffer or no more characters
     while(serial->available()){
@@ -140,9 +142,11 @@ int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_size, char e
     
     return count;
   } else { //wait for eol and ignore if serial buffer is empty
+    unsigned long start_time = millis(); //start the timer
     char c = eol - 1; //assign a different value for the first time
     while(c != eol){
       if(serial->available()){
+        start_time = millis(); //reset to give time to type the entire message
         c = serial->read();
         buffer[count++] = c;
       }
@@ -157,6 +161,14 @@ int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_size, char e
         }
         break; //exit main while loop
       }
+      
+      //check timeout
+      if(millis() >= (start_time + timeout)){
+        if(timeout != 0){
+          count++; //(+1) to correct the index when nothing or no EOL received
+          break; //exit while loop
+        }
+      }
     }
     
     //add '\0' at the end (NULL terminated string)
@@ -167,6 +179,83 @@ int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_size, char e
     return (count - 1); //(-1) because EOL is included
   }
 }
+
+//------------------------
+
+#ifndef STRING_FUNCTIONS_NO_SOFTWARE_SERIAL
+// Read a string from serial until buffer is full, eol is reached (if eol not NULL) or
+//   no more characters in the serial buffer (if eol is NULL)
+//  (returns the string length)
+//  NOTE: it is recommended to create the buffer with 1 additional char because
+//        the code adds the NULL termination
+//         (ex: desired size = 30 >> create with 31 and pass this value as parameter)
+int ReadFromSerial(SoftwareSerial *serial, char *buffer, int buffer_size, char eol, unsigned long timeout){
+  int count = 0;
+  if(eol == NULL){ //default value, means wait for full buffer or no more characters
+    while(serial->available()){
+      buffer[count++] = serial->read();
+      
+      delayMicroseconds(RC_READ_SERIAL_DELAY); //wait for all data to arrive
+      
+      //check for buffer overflow
+      if(count >= buffer_size){
+        //flush serial buffer
+        while(serial->available()){
+          char c = serial->read();
+        }
+        break; //exit main while loop
+      }
+    }
+    
+    //add '\0' at the end (NULL terminated string)
+    buffer[buffer_size - 1] = '\0';
+    if(count < buffer_size)
+      buffer[count] = '\0';
+    
+    //correction for exact buffer size
+    if(count == buffer_size)
+      count--;
+    
+    return count;
+  } else { //wait for eol and ignore if serial buffer is empty
+    unsigned long start_time = millis(); //start the timer
+    char c = eol - 1; //assign a different value for the first time
+    while(c != eol){
+      if(serial->available()){
+        start_time = millis(); //reset to give time to type the entire message
+        c = serial->read();
+        buffer[count++] = c;
+      }
+      
+      delayMicroseconds(RC_READ_SERIAL_DELAY); //wait for all data to arrive
+      
+      //check for buffer overflow
+      if(count >= buffer_size){
+        //flush serial buffer
+        while(serial->available()){
+          c = serial->read();
+        }
+        break; //exit main while loop
+      }
+      
+      //check timeout
+      if(millis() >= (start_time + timeout)){
+        if(timeout != 0){
+          count++; //(+1) to correct the index when nothing or no EOL received
+          break; //exit while loop
+        }
+      }
+    }
+    
+    //add '\0' at the end (NULL terminated string)
+    buffer[buffer_size - 1] = '\0';
+    if(count < buffer_size)
+      buffer[count - 1] = '\0'; //(-1) because EOL is included
+    
+    return (count - 1); //(-1) because EOL is included
+  }
+}
+#endif
 
 //-------------------------------------------------------------------------------------------------
 

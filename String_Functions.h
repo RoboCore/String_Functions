@@ -3,7 +3,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.4 - 15/08/2014)
+		(v1.5 - 18/09/2014)
 
   Library to manipulate strings
     (tested with Arduino 0022 and 1.0.1)
@@ -34,6 +34,8 @@
   NOTE: more functions (and alternative ones) can be found
 	in the <string.h> library
 
+  NOTE: SoftwareSerial is only available for Arduino 1.0.1+
+
 
 
   OBS:	char* str1 = "test";
@@ -45,12 +47,17 @@
 
 
 #if defined(ARDUINO) && (ARDUINO >= 100)
-#include <Arduino.h> //for Arduino 1.0 or later
+#include <Arduino.h>         // for Arduino 1.0 or later
 #else
-#include <WProgram.h> //for Arduino 22
+#include <WProgram.h>        // for Arduino 0022 and 0023
+#undef STRING_FUNCTIONS_NO_SOFTWARE_SERIAL   // the SoftwareSerial library is not recommended for versions before 1.0
 #endif
 
 #include <Memory.h>
+
+#ifndef STRING_FUNCTIONS_NO_SOFTWARE_SERIAL
+#include <SoftwareSerial.h>
+#endif
 
 
 //#define RC_STRING_DEBUG
@@ -75,7 +82,11 @@ void IntToStr(long value, char *buffer, int buffer_size);
 //  NOTE: it is recommended to create the buffer with 1 additional char because
 //        the code adds the NULL termination
 //         (ex: desired size = 30 >> create with 31 and pass this value as parameter)
-int ReadFromSerial(HardwareSerial* serial, char* buffer, int buffer_length, char eol = NULL);
+int ReadFromSerial(HardwareSerial *serial, char *buffer, int buffer_length, char eol = NULL, unsigned long timeout = 0);
+
+#ifndef STRING_FUNCTIONS_NO_SOFTWARE_SERIAL
+int ReadFromSerial(SoftwareSerial *serial, char *buffer, int buffer_length, char eol = NULL, unsigned long timeout = 0);
+#endif
 
 //-------------------------------------------------------------------------------------------------
 
