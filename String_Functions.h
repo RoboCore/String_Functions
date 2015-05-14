@@ -46,16 +46,18 @@
 */
 
 
+//#define STRING_FUNCTIONS_SOFTWARE_SERIAL
+
 #if defined(ARDUINO) && (ARDUINO >= 100)
 #include <Arduino.h>         // for Arduino 1.0 or later
 #else
 #include <WProgram.h>        // for Arduino 0022 and 0023
-#undef STRING_FUNCTIONS_NO_SOFTWARE_SERIAL   // the SoftwareSerial library is not recommended for versions before 1.0
+#undef STRING_FUNCTIONS_SOFTWARE_SERIAL   // the SoftwareSerial library is not recommended for versions before 1.0
 #endif
 
 #include <Memory.h>
 
-#ifndef STRING_FUNCTIONS_NO_SOFTWARE_SERIAL
+#ifdef STRING_FUNCTIONS_SOFTWARE_SERIAL
 #include <SoftwareSerial.h>
 #endif
 
@@ -84,7 +86,7 @@ void IntToStr(long value, char *buffer, int buffer_size);
 //         (ex: desired size = 30 >> create with 31 and pass this value as parameter)
 int ReadFromSerial(HardwareSerial *serial, char *buffer, int buffer_length, char eol = NULL, unsigned long timeout = 0);
 
-#ifndef STRING_FUNCTIONS_NO_SOFTWARE_SERIAL
+#ifdef STRING_FUNCTIONS_SOFTWARE_SERIAL
 int ReadFromSerial(SoftwareSerial *serial, char *buffer, int buffer_length, char eol = NULL, unsigned long timeout = 0);
 #endif
 

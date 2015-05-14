@@ -2,7 +2,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.5 - 18/09/2014)
+		(v1.5 - 14/05/2015)
 
   Library to manipulate strings
     (tested with Arduino 0022 and 1.0.1)
@@ -123,10 +123,10 @@ int ReadFromSerial(HardwareSerial *serial, char *buffer, int buffer_size, char e
       
       //check for buffer overflow
       if(count >= buffer_size){
-        //flush serial buffer
-        while(serial->available()){
-          char c = serial->read();
-        }
+//        //flush serial buffer
+//        while(serial->available()){
+//          char c = serial->read();
+//        }
         break; //exit main while loop
       }
     }
@@ -155,10 +155,10 @@ int ReadFromSerial(HardwareSerial *serial, char *buffer, int buffer_size, char e
       
       //check for buffer overflow
       if(count >= buffer_size){
-        //flush serial buffer
-        while(serial->available()){
-          c = serial->read();
-        }
+//        //flush serial buffer
+//        while(serial->available()){
+//          c = serial->read();
+//        }
         break; //exit main while loop
       }
       
@@ -182,7 +182,7 @@ int ReadFromSerial(HardwareSerial *serial, char *buffer, int buffer_size, char e
 
 //------------------------
 
-#ifndef STRING_FUNCTIONS_NO_SOFTWARE_SERIAL
+#ifdef STRING_FUNCTIONS_SOFTWARE_SERIAL
 // Read a string from serial until buffer is full, eol is reached (if eol not NULL) or
 //   no more characters in the serial buffer (if eol is NULL)
 //  (returns the string length)
@@ -199,10 +199,10 @@ int ReadFromSerial(SoftwareSerial *serial, char *buffer, int buffer_size, char e
       
       //check for buffer overflow
       if(count >= buffer_size){
-        //flush serial buffer
-        while(serial->available()){
-          char c = serial->read();
-        }
+//        //flush serial buffer
+//        while(serial->available()){
+//          char c = serial->read();
+//        }
         break; //exit main while loop
       }
     }
@@ -231,10 +231,10 @@ int ReadFromSerial(SoftwareSerial *serial, char *buffer, int buffer_size, char e
       
       //check for buffer overflow
       if(count >= buffer_size){
-        //flush serial buffer
-        while(serial->available()){
-          c = serial->read();
-        }
+//        //flush serial buffer
+//        while(serial->available()){
+//          c = serial->read();
+//        }
         break; //exit main while loop
       }
       
