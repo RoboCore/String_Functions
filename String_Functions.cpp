@@ -2,7 +2,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.5 - 14/05/2015)
+		(v1.5 - 17/12/2015)
 
   Library to manipulate strings
     (tested with Arduino 0022 and 1.0.1)
@@ -510,6 +510,10 @@ int StrFind(char* str1, char* str2, byte options){
       }
     }
   }
+
+  //check if valid data (could have found the last characters of the string but not all of them)
+  if((pos + len2 - 1) > len1)
+    pos = -1; //reset
   
   return pos;
 }
