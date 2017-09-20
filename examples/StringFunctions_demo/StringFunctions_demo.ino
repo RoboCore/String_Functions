@@ -1,12 +1,12 @@
 
 /*
 	RoboCore - String Functions example
-		(18/09/2014)
+		(20/09/2017)
 
-  Written by François
+  Written by François.
   
   Examples of how to use the several functions of
-  the library
+  the library.
   
 */
 
@@ -164,15 +164,25 @@ void loop(){
   char* test = NULL;
   test = "STRING to search F"; // .DATA section
   Serial.println(test);
-  Serial.print("s: "); Serial.print(StrFind(test, 's')); Serial.print(" | "); Serial.println(StrFind(test, 's', CASE_INSENSITIVE));
-  Serial.print("NULL: "); Serial.print(StrFind(test, '\0')); Serial.print(" | "); Serial.println(StrFind(test, '\0', CASE_INSENSITIVE));
+  Serial.print("s: "); Serial.print(StrFind(test, 's')); Serial.print(" | "); Serial.println(StrFind(test, 's', 0, CASE_SENSITIVE));
+  Serial.print("s: "); Serial.print(StrFind(test, 's', 5)); Serial.print(" | "); Serial.println(StrFind(test, 's', 5, CASE_SENSITIVE));
+  Serial.print("NULL: "); Serial.print(StrFind(test, '\0')); Serial.print(" | "); Serial.println(StrFind(test, '\0', 0, CASE_SENSITIVE));
 
   Serial.println();  
   char* str = NULL;
   str = "SeArCh"; // .DATA section
   Serial.println(str);
-  Serial.print("s: "); Serial.print(StrFind(test, str)); Serial.print(" | "); Serial.println(StrFind(test, str, CASE_INSENSITIVE));
-  Serial.print("(same): "); Serial.print(StrFind(str, str)); Serial.print(" | "); Serial.println(StrFind(str, str, CASE_INSENSITIVE));
+  Serial.print("s: "); Serial.print(StrFind(test, str)); Serial.print(" | "); Serial.println(StrFind(test, str, 0, CASE_SENSITIVE));
+  Serial.print("s: "); Serial.print(StrFind(test, str, 1)); Serial.print(" | "); Serial.println(StrFind(test, str, 1, CASE_SENSITIVE));
+  Serial.print("(same): "); Serial.print(StrFind(str, str)); Serial.print(" | "); Serial.println(StrFind(str, str, 0, CASE_SENSITIVE));
+  
+  Serial.println();  
+  char* str1 = "ABCdef:aBc";
+  char* str2 = "Abc";
+  Serial.println(str1);
+  Serial.println(str2);
+  Serial.print("2 in 1: "); Serial.print(StrFind(str1, str2)); Serial.print(" | "); Serial.println(StrFind(str1, str2, 0, CASE_SENSITIVE));
+  Serial.print("2 in 1: "); Serial.print(StrFind(str1, str2, 1)); Serial.print(" | "); Serial.println(StrFind(str1, str2, 1, CASE_SENSITIVE));
   
   
   Serial.println();

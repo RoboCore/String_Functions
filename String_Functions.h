@@ -3,12 +3,11 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.5 - 18/09/2014)
+		(v1.6 - 20/09/2017)
 
-  Library to manipulate strings
-    (tested with Arduino 0022 and 1.0.1)
+  Library to manipulate strings.
 
-  Copyright 2013 RoboCore (François) ( http://www.RoboCore.net )
+  Copyright 2017 RoboCore (François) ( http://www.RoboCore.net )
   
   ------------------------------------------------------------------------------
   This program is free software: you can redistribute it and/or modify
@@ -65,8 +64,8 @@
 //#define RC_STRING_DEBUG
 
 // bitwise values for StrCompare() and StrFind()
-#define CASE_SENSITIVE 0
-#define CASE_INSENSITIVE (1 << 0)
+#define CASE_INSENSITIVE  0x00
+#define CASE_SENSITIVE    0x01
 
 //-------------------------------------------------------------------------------------------------
 
@@ -98,7 +97,7 @@ int ReadFromSerial(SoftwareSerial *serial, char *buffer, int buffer_length, char
 //   and until length or end of str2 is reached
 //  NOTE: by default start = 0, length = StrLength(str2) and is CASE_SENSITIVE
 //    (returns the number of matched characters (0 if none matched) or
-//      -1 on errror)
+//      -1 on error)
 //  NOTE: if(return == StrLength(str2)), str2 was found in str1. Otherwise
 //          only part (or nothing) of str2 was found
 int StrCompare(char* str1, char* str2);
@@ -119,17 +118,21 @@ char* StrConcat(char* str1, char* str2);
 //-------------------------------------------------------------------------------------------------
 
 // Finds the position of a character in a string
-//  NOTE: by default uses CASE_SENSITIVE comparison
+//  NOTE: by default uses CASE_INSENSITIVE comparison
+//  NOTE: by default starts at position 0
 //    (returns -1 if 'string' is empty, 'c' wasn't found or 'c' is NULL)
 int StrFind(char* string, char c);
-int StrFind(char* string, char c, byte options);
+int StrFind(char* string, char c, int start);
+int StrFind(char* string, char c, int start, byte options);
 
 
 // Finds the position of str2 in str1
-//  NOTE: by default uses CASE_SENSITIVE comparison
+//  NOTE: by default uses CASE_INSENSITIVE comparison
+//  NOTE: by default starts at position 0
 //    (returns -1 if str2 > str1, str2 is empty or coudn't find)
 int StrFind(char* str1, char* str2);
-int StrFind(char* str1, char* str2, byte options);
+int StrFind(char* str1, char* str2, int start);
+int StrFind(char* str1, char* str2, int start, byte options);
 
 //-------------------------------------------------------------------------------------------------
 

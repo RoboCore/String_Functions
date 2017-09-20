@@ -2,12 +2,11 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.5 - 17/12/2015)
+		(v1.6 - 20/09/2017)
 
-  Library to manipulate strings
-    (tested with Arduino 0022 and 1.0.1)
+  Library to manipulate strings.
 
-  Copyright 2013 RoboCore (François) ( http://www.RoboCore.net )
+  Copyright 2017 RoboCore (François) ( http://www.RoboCore.net )
   
   ------------------------------------------------------------------------------
   This program is free software: you can redistribute it and/or modify
@@ -293,7 +292,7 @@ int StrCompare(char* str1, char* str2, int start, int length){
 //   and until length or end of str2 is reached
 //  NOTE: by default start = 0, length = StrLength(str2) and is CASE_SENSITIVE
 //    (returns the number of matched characters (0 if none matched) or
-//      -1 on errror)
+//      -1 on error)
 //  NOTE: if(return == StrLength(str2)), str2 was found in str1. Otherwise
 //          only part (or nothing) of str2 was found
 int StrCompare(char* str1, char* str2, int start, int length, byte options){
@@ -330,9 +329,9 @@ int StrCompare(char* str1, char* str2, int start, int length, byte options){
     c2 = str2[i]; //get unchanged
     
     //binary comparison
-    if((c1 != c2) && (options ^ CASE_INSENSITIVE)){ //different character and case SENSITIVE
+    if((c1 != c2) && (options & CASE_SENSITIVE)){ //different character and case SENSITIVE
       break;
-    } else if((c1 != c2) && (options & CASE_INSENSITIVE)){ //case INSENSITIVE comparison
+    } else if(c1 != c2){ //case INSENSITIVE comparison
       if((c1 >= 97) && (c1 <= 122)) //'a' to 'z'
         c1 -= 32; //convert to 'A' to 'Z'
       
@@ -395,16 +394,25 @@ char* StrConcat(char* str1, char* str2){
 //-------------------------------------------------------------------------------------------------
 
 // Finds the position of a character in a string
-//  NOTE: by default uses CASE_SENSITIVE comparison
+//  NOTE: by default uses CASE_INSENSITIVE comparison
+//  NOTE: by default starts at position 0
 //    (returns -1 if 'string' is empty, 'c' wasn't found or 'c' is NULL)
 int StrFind(char* string, char c){
-  return StrFind(string, c, CASE_SENSITIVE);
+  return StrFind(string, c, 0, CASE_INSENSITIVE);
+}
+
+
+// Finds the position of a character in a string
+//  NOTE: by default uses CASE_INSENSITIVE comparison
+//    (returns -1 if 'string' is empty, 'c' wasn't found or 'c' is NULL)
+int StrFind(char* string, char c, int start){
+  return StrFind(string, c, start, CASE_INSENSITIVE);
 }
 
 
 // Finds the position of a character in a string
 //    (returns -1 if 'string' is empty, 'c' wasn't found or 'c' is NULL)
-int StrFind(char* string, char c, byte options){
+int StrFind(char* string, char c, int start, byte options){
   int length = StrLength(string);
   int pos = -1;
   
@@ -413,9 +421,11 @@ int StrFind(char* string, char c, byte options){
     return pos;
   if(c == NULL)
     return pos;
+  if((start + 1) >= length)
+    return pos;
   
   //find character
-  for(int i=0 ; i < length ; i++){
+  for(int i=start ; i < length ; i++){
     //binary comparison
     if(c == string[i]){
       pos = i;
@@ -423,14 +433,13 @@ int StrFind(char* string, char c, byte options){
     }
     
     //case INSENSITIVE comparison
-    if(options & CASE_INSENSITIVE){
-      if((c >= 65) && (c <= 90)){ //'A' to 'Z'
+    if(!(options & CASE_SENSITIVE)){
+      if((c >= 65) && (c <= 90)){         //'A' to 'Z'
         if((c + 32) == string[i]){
           pos = i;
           break;
         }
-      }
-      if((c >= 97) && (c <= 122)){ //'a' to 'z'
+      } else if((c >= 97) && (c <= 122)){ //'a' to 'z'
         if((c - 32) == string[i]){
           pos = i;
           break;
@@ -445,16 +454,25 @@ int StrFind(char* string, char c, byte options){
 //-----------------------------------
 
 // Finds the position of str2 in str1
-//  NOTE: by default uses CASE_SENSITIVE comparison
+//  NOTE: by default uses CASE_INSENSITIVE comparison
+//  NOTE: by default starts at position 0
 //    (returns -1 if str2 > str1, str2 is empty or coudn't find)
 int StrFind(char* str1, char* str2){
-  return StrFind(str1, str2, CASE_SENSITIVE);
+  return StrFind(str1, str2, 0, CASE_INSENSITIVE);
+}
+
+
+// Finds the position of str2 in str1
+//  NOTE: by default uses CASE_INSENSITIVE comparison
+//    (returns -1 if str2 > str1, str2 is empty or coudn't find)
+int StrFind(char* str1, char* str2, int start){
+  return StrFind(str1, str2, start, CASE_INSENSITIVE);
 }
 
 
 // Finds the position of str2 in str1
 //    (returns -1 if str2 > str1, str2 is empty or coudn't find)
-int StrFind(char* str1, char* str2, byte options){
+int StrFind(char* str1, char* str2, int start, byte options){
   int len1 = StrLength(str1);
   int len2 = StrLength(str2);
   int pos = -1;
@@ -464,11 +482,13 @@ int StrFind(char* str1, char* str2, byte options){
     return pos;
   if(len2 == 0)
     return pos;
+  if((start + 1) >= len1)
+    return pos;
   
   //find character
   boolean began = false; //true when found the first character
   char c1, c2;
-  for(int i=0 ; i < len1 ; i++){
+  for(int i=start ; i < len1 ; i++){
     //check if already found
     if((pos != -1) && ((i - pos) >= len2))
       break;
@@ -486,13 +506,13 @@ int StrFind(char* str1, char* str2, byte options){
         pos = i;
         began = true; //set
       }
-    } else if(began && (options ^ CASE_INSENSITIVE)){ //broke sequence and is CASE_SENSITIVE, so find next
+    } else if(began && (options & CASE_SENSITIVE)){ //broke sequence and is CASE_SENSITIVE, so find next
       pos = -1;
       began = false; //reset
     }
     
     //case INSENSITIVE comparison
-    if(options & CASE_INSENSITIVE){
+    if(!(options & CASE_SENSITIVE)){
       if((c1 >= 97) && (c1 <= 122)) //'a' to 'z'
         c1 -= 32; //convert to 'A' to 'Z'
       

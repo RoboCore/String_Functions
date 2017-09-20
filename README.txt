@@ -1,11 +1,10 @@
 
 	RoboCore String Functions Library
-		(v1.5 - 18/09/2014)
+		(v1.6 - 20/09/2017)
 
-  Library to manipulate strings
-    (tested with Arduino 0022 and 1.0.1)
+  Library to manipulate strings.
 
-  Copyright 2013 RoboCore (François) ( http://www.RoboCore.net )
+  Copyright 2017 RoboCore (François) ( http://www.RoboCore.net )
   
   ------------------------------------------------------------------------------
   This program is free software: you can redistribute it and/or modify
