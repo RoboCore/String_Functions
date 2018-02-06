@@ -1,6 +1,6 @@
 
 	RoboCore String Functions Library
-		(v1.6 - 20/09/2017)
+		(v1.7 - 06/02/2018)
 
   Library to manipulate strings.
 

@@ -2,7 +2,7 @@
 
 /*
 	RoboCore String Functions Library
-		(v1.6 - 20/09/2017)
+		(v1.7 - 06/02/2018)
 
   Library to manipulate strings.
 
@@ -421,7 +421,7 @@ int StrFind(char* string, char c, int start, byte options){
     return pos;
   if(c == NULL)
     return pos;
-  if((start + 1) >= length)
+  if(start >= length)
     return pos;
   
   //find character
@@ -482,7 +482,7 @@ int StrFind(char* str1, char* str2, int start, byte options){
     return pos;
   if(len2 == 0)
     return pos;
-  if((start + 1) >= len1)
+  if((start + len2) > len1)
     return pos;
   
   //find character
